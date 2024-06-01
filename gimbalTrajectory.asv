@@ -3,37 +3,52 @@ close all
 
 gamma=30;   % [deg]
 
-psi1=20;  % [deg]
-beta1=15; % [deg]
-psi2=-10;  % [deg]
-beta2=-15; % [deg]
+elevation1=20;  % [deg] elevation angle with Z - phi
+azimuth1=0;  % [deg] azimuth angle in XY plane - curlphi
+elevation2=30;  % [deg] elevation angle with Z - phi
+azimuth2=70;  % [deg] azimuth angle in XY plane - curlphi
 
-rotpsi1=rotx(psi1/180*pi);
-rotbeta1=roty(beta1/180*pi);
-rotpsi2=rotx(psi2/180*pi);
-rotbeta2=roty(beta2/180*pi);
+rotElev1=roty(elevation1);   % input to totx, roty, rotz is in degrees 
+rotAz1=rotz(azimuth1);
 
-rot1=rotbeta1*rotpsi1;
-rot2=rotbeta2*rotpsi2;
+rotElev2=roty(elevation2);
+rotAz2=rotz(azimuth2);
 
-q1=rotm2quat(rot1);
-q2=rotm2quat(rot2);
+rot1=rotAz1*rotElev1;
+rot2=rotAz2*rotElev2;
 
-q1_=eul2quat([psi1/180*pi,beta1/180*pi,0],'YXZ');
-q2_=eul2quat([psi2/180*pi,beta2/180*pi,0],'YXZ');
+% q1=rotm2quat(rot1);
+% q2=rotm2quat(rot2);
 
-alpha1=linspace(alpha11, alpha12, Nalpha1);
-alpha2=linspace(alpha21, alpha22, Nalpha2);
-[Alpha1, Alpha2]=meshgrid(alpha1,alpha2);
+% q1_=eul2quat([0,-elevation1,-azimuth1]/180*pi,'ZYX');
+% q2_=eul2quat([azimuth2,elevation2,0]/180*pi,'XYZ');
+rinit=[0;0;1];
+r1=rot1*rinit;
+r2=rot2*rinit;
 
-fffd2=asin(sind(Alpha2/2)*sind(gamma))/pi*180;  % angle with Z axis
+r1r2axis=cross(r1,r2); r1r2axis=r1r2axis/norm(r1r2axis);
+theta=acos(dot(r1,r2));
+N=10;
+dtheta=theta/N;
 
-eta=acos((sind(Alpha2/2)-sind(gamma)*sind(fffd2))./(cosd(fffd2)*cosd(gamma)))/pi*180;
-phi=(180-Alpha1-eta);
-fff=2*fffd2;
-R=1;
-X=R*sind(fff).*cosd(180-phi);
-Y=R*sind(fff).*sind(180-phi);
-Z=R*cosd(fff);
-surf(X,Y,Z)
+rotdtheta=axang2rotm([r1r2axis',dtheta]);
 
+figure(1)
+plot3([0,r1(1)],[0,r1(2)],[0,r1(3)],'rx-'); hold on; grid on; axis equal
+plot3([0,r2(1)],[0,r2(2)],[0,r2(3)],'mx-'); 
+xlabel('x');
+ylabel('y');
+zlabel('z');
+
+curr=r1;
+for i=1:N
+    curr=rotdtheta*curr;
+    plot3([curr(1)],[curr(2)],[curr(3)],'bo'); 
+    elevation(i)=acos(dot(curr,[0,0,1]));
+    azimuth(i)=atan2(curr(2),curr(1));
+    alpha2(i)=2*asin(sin(elevation(i)/2)/sin(gamma));
+    eta=acos((sind(alpha2(i)/2)-sind(gamma)*sin(elevation(i)/2))/(cos(elevation(i)/2)*cosd(gamma)))/pi*180;
+    alpha1(i)=pi-eta-azimuth(i);
+end
+figure(2);
+plot(elevation)
