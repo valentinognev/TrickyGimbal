@@ -1,0 +1,26 @@
+clear all
+close all
+
+gamma=15;   % [deg]
+
+alpha11 = -100;   %[deg]
+alpha12 = 100;  %[deg]
+Nalpha1 = 100;
+alpha21 = 30;   %[deg]
+alpha22 = 300;  %[deg]
+Nalpha2 = 70;
+alpha1=linspace(alpha11, alpha12, Nalpha1);
+alpha2=linspace(alpha21, alpha22, Nalpha2);
+[Alpha1, Alpha2]=meshgrid(alpha1,alpha2);
+
+fffd2=asin(sind(Alpha2/2)*sind(gamma));  % angle with Z axis
+
+eta=acos((sind(Alpha2/2)-sind(gamma)*sin(fffd2))./(cos(fffd2)*cosd(gamma)))/pi*180;
+phi=(180-Alpha1-eta);
+fff=2*fffd2;
+R=1;
+X=R*sind(fff).*cosd(180-phi);
+Y=R*sind(fff).*sind(180-phi);
+Z=R*cosd(fff);
+mesh(X,Y,Z)
+

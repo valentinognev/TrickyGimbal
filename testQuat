@@ -1,0 +1,3 @@
+clear all
+
+deg2grad=pi/180;
