@@ -3,10 +3,10 @@ close all
 
 gamma=30/180*pi;   % [deg]
 
-elevation1=20;  % [deg] elevation angle with Z - phi
-azimuth1=0;  % [deg] azimuth angle in XY plane - curlphi
-elevation2=30;  % [deg] elevation angle with Z - phi
-azimuth2=70;  % [deg] azimuth angle in XY plane - curlphi
+elevation1=0.67/pi*180;%20;  % [deg] elevation angle with Z - phi
+azimuth1=-1.23/pi*180;%0;  % [deg] azimuth angle in XY plane - curlphi
+elevation2=0.69/pi*180;%30;  % [deg] elevation angle with Z - phi
+azimuth2=1.96/pi*180;%70;  % [deg] azimuth angle in XY plane - curlphi
 
 rotElev1=roty(elevation1);   % input to totx, roty, rotz is in degrees 
 rotAz1=rotz(azimuth1);
@@ -43,13 +43,15 @@ rotdtheta=axang2rotm([r1r2axis',dtheta]);
 curr=r1;
 for i=1:N
     curr=rotdtheta*curr;
-    % plot3([curr(1)],[curr(2)],[curr(3)],'bo'); 
+    figure(1); hold on; plot3([curr(1)],[curr(2)],[curr(3)],'bo'); 
     elevation(i)=acos(dot(curr,[0,0,1]));
     azimuth(i)=atan2(curr(2),curr(1));
     alpha2(i)=2*asin(sin(elevation(i)/2)/sin(gamma));
     eta=acos((sin(alpha2(i)/2)-sin(gamma)*sin(elevation(i)/2))/(cos(elevation(i)/2)*cos(gamma)));
     alpha1(i)=pi-eta-azimuth(i);
-    disp (sprintf('elevation %f , azimuth %f , alpha1 %f , alpha2 %f \n',elevation(i),azimuth(i),alpha1(i),alpha2(i)) );
+    disp (sprintf('elevation %f , azimuth %f , alpha1 %f , alpha2 %f',elevation(i),azimuth(i),alpha1(i),alpha2(i)) );
+    disp ''
 end
 figure(2);
-plot(elevation)
+plot(elevation,'x-'); hold on
+plot(azimuth,'x-'); hold on

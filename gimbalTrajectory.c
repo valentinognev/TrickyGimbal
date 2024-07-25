@@ -4,30 +4,62 @@
 #define PI 3.14159265
 #define DEG2RAD(deg) ((deg) * PI / 180.0)
 #define RAD2DEG(rad) ((rad) * 180.0 / PI)
+#define NUMOFSTEPS 10
+#define GAMMA  (DEG2RAD(20))
 
 // Assuming you have implemented these functions
-void roty(double angle, double matrix[3][3]);
-void rotz(double angle, double matrix[3][3]);
-void cross(double a[3], double b[3], double result[3]);
-double dot(double a[3], double b[3]);
-void axang2rotm(double axis[3], double angle, double matrix[3][3]);
-void matvecmul(const double mat[3][3], const double vec[3], double result[3]);
+void roty(float angle, float matrix[3][3]);
+void rotz(float angle, float matrix[3][3]);
+void cross(float a[3], float b[3], float result[3]);
+float dot(float a[3], float b[3]);
+void axang2rotm(float axis[3], float angle, float matrix[3][3]);
+void matvecmul(const float mat[3][3], const float vec[3], float result[3]);
+
+void getSteps(const float elevation1, const float azimuth1, const float elevation2, const float azimuth2,
+float alpha2[NUMOFSTEPS], float alpha1[NUMOFSTEPS]);
 
 int main() 
 {
-    double gamma = DEG2RAD(30);
-    double elevation1 = DEG2RAD(20);
-    double azimuth1 = DEG2RAD(0);
-    double elevation2 = DEG2RAD(30);
-    double azimuth2 = DEG2RAD(70);
-    double rotElev1[3][3], rotAz1[3][3], rotElev2[3][3], rotAz2[3][3];
-    double rot1[3][3], rot2[3][3];
-    double rinit[3] = {0, 0, 1};
-    double r1[3], r2[3];
-    double r1r2axis[3], theta;
-    int N = 10;
-    double dtheta, rotdtheta[3][3];
-    double elevation[N], azimuth[N], alpha2[N], eta, alpha1[N];
+    float elevation1 = DEG2RAD(20);
+    float azimuth1 = DEG2RAD(0);
+    float elevation2 = DEG2RAD(30);
+    float azimuth2 = DEG2RAD(70);
+
+    elevation1 = 0.67;
+    azimuth1 = -1.23;
+    elevation2 = 0.69;
+    azimuth2 = 1.96;
+
+    float alpha1[NUMOFSTEPS]={0};
+    float alpha2[NUMOFSTEPS]={0};
+    getSteps(elevation1, azimuth1, elevation2, azimuth2, alpha1, alpha2);
+}
+
+void alpha12toAzEl(const float alpha1, const float alpha2, float* azimuth, float* elevation)
+{
+    *elevation = 2 * asin(sin(alpha2 / 2) * sin(GAMMA));
+    float eta = acos((sin(alpha2 / 2) - sin(GAMMA) * sin(*elevation / 2)) / (cos(*elevation / 2) * cos(GAMMA)));
+    *azimuth = PI - eta - alpha1;
+}
+
+void azElToAlpha12(const float azimuth, const float elevation, float *alpha1, float *alpha2 )
+{
+    *alpha2 = 2 * asin(sin(elevation / 2) / sin(GAMMA));
+    float eta = acos((sin(*alpha2 / 2) - sin(GAMMA) * sin(elevation / 2)) / (cos(elevation / 2) * cos(GAMMA)));
+    *alpha1 = PI - eta - azimuth;
+}
+
+void getSteps(const float elevation1, const float azimuth1, const float elevation2, const float azimuth2,
+            float alpha1[NUMOFSTEPS], float alpha2[NUMOFSTEPS])
+{
+    float rotElev1[3][3], rotAz1[3][3], rotElev2[3][3], rotAz2[3][3];
+    float rot1[3][3], rot2[3][3];
+    float rinit[3] = {0, 0, 1};
+    float r1[3], r2[3];
+    float r1r2axis[3], theta;
+
+    float dtheta, rotdtheta[3][3];
+    float elevation[NUMOFSTEPS], azimuth[NUMOFSTEPS],  eta;
 
     roty(elevation1, rotElev1);
     rotz(azimuth1, rotAz1);
@@ -43,26 +75,26 @@ int main()
     matvecmul(rot2, rinit, r2);
 
     cross(r1, r2, r1r2axis);
-    double norm = sqrt(dot(r1r2axis, r1r2axis));
+    float norm = sqrt(dot(r1r2axis, r1r2axis));
     for (int i = 0; i < 3; i++) {
         r1r2axis[i] /= norm;
     }
 
     theta = acos(dot(r1, r2));
-    dtheta = theta / N;
+    dtheta = theta / NUMOFSTEPS;
 
     axang2rotm(r1r2axis, dtheta, rotdtheta);
 
-    double curr[3] = {r1[0], r1[1], r1[2]};
-    for (int i = 0; i < N; i++) 
+    float curr[3] = {r1[0], r1[1], r1[2]};
+    for (int i = 0; i < NUMOFSTEPS; i++) 
     {
-        double ncurr[3]={curr[0],curr[1],curr[2]};
+        float ncurr[3]={curr[0],curr[1],curr[2]};
 
         matvecmul(rotdtheta, ncurr, curr);
-        elevation[i] = acos(dot(curr, (double[]){0, 0, 1}));
+        elevation[i] = acos(dot(curr, (float[]){0, 0, 1}));
         azimuth[i] = atan2(curr[1], curr[0]);
-        alpha2[i] = 2 * asin(sin(elevation[i] / 2) / sin(gamma));
-        eta = acos((sin(alpha2[i] / 2) - sin(gamma) * sin(elevation[i] / 2)) / (cos(elevation[i] / 2) * cos(gamma)));
+        alpha2[i] = 2 * asin(sin(elevation[i] / 2) / sin(GAMMA));
+        eta = acos((sin(alpha2[i] / 2) - sin(GAMMA) * sin(elevation[i] / 2)) / (cos(elevation[i] / 2) * cos(GAMMA)));
         alpha1[i] = PI - eta - azimuth[i];
         printf("elevation %f , azimuth %f , alpha1 %f , alpha2 %f \n",elevation[i],azimuth[i],alpha1[i],alpha2[i]) ;
     }
@@ -73,7 +105,7 @@ int main()
 
 
 // Matrix multiplication
-void matmul(double a[3][3], double b[3][3], double result[3][3]) {
+void matmul(float a[3][3], float b[3][3], float result[3][3]) {
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             result[i][j] = 0;
@@ -85,7 +117,7 @@ void matmul(double a[3][3], double b[3][3], double result[3][3]) {
 }
 
 // Matrix-vector multiplication
-void matvecmul(const double mat[3][3], const double vec[3], double result[3]) {
+void matvecmul(const float mat[3][3], const float vec[3], float result[3]) {
     for (int i = 0; i < 3; i++) {
         result[i] = 0;
         for (int j = 0; j < 3; j++) {
@@ -95,15 +127,15 @@ void matvecmul(const double mat[3][3], const double vec[3], double result[3]) {
 }
 
 // Cross product
-void cross(double a[3], double b[3], double result[3]) {
+void cross(float a[3], float b[3], float result[3]) {
     result[0] = a[1] * b[2] - a[2] * b[1];
     result[1] = a[2] * b[0] - a[0] * b[2];
     result[2] = a[0] * b[1] - a[1] * b[0];
 }
 
 // Dot product
-double dot(double a[3], double b[3]) {
-    double result = 0;
+float dot(float a[3], float b[3]) {
+    float result = 0;
     for (int i = 0; i < 3; i++) {
         result += a[i] * b[i];
     }
@@ -111,7 +143,7 @@ double dot(double a[3], double b[3]) {
 }
 
 // Rotation about y-axis
-void roty(double angle, double result[3][3]) {
+void roty(float angle, float result[3][3]) {
     result[0][0] = cos(angle);
     result[0][1] = 0;
     result[0][2] = sin(angle);
@@ -124,7 +156,7 @@ void roty(double angle, double result[3][3]) {
 }
 
 // Rotation about z-axis
-void rotz(double angle, double result[3][3]) {
+void rotz(float angle, float result[3][3]) {
     result[0][0] = cos(angle);
     result[0][1] = -sin(angle);
     result[0][2] = 0;
@@ -137,11 +169,11 @@ void rotz(double angle, double result[3][3]) {
 }
 
 // Axis-angle to rotation matrix
-void axang2rotm(double axis[3], double angle, double result[3][3]) {
-    double c = cos(angle);
-    double s = sin(angle);
-    double t = 1 - c;
-    double x = axis[0], y = axis[1], z = axis[2];
+void axang2rotm(float axis[3], float angle, float result[3][3]) {
+    float c = cos(angle);
+    float s = sin(angle);
+    float t = 1 - c;
+    float x = axis[0], y = axis[1], z = axis[2];
 
     result[0][0] = t*x*x + c;
     result[0][1] = t*x*y - s*z;
