@@ -1,7 +1,7 @@
 clear all
 close all
 
-gamma=30/180*pi;   % [deg]
+gamma=20/180*pi;   % [deg]
 
 elevation1=0.67/pi*180;%20;  % [deg] elevation angle with Z - phi
 azimuth1=-1.23/pi*180;%0;  % [deg] azimuth angle in XY plane - curlphi
@@ -16,6 +16,22 @@ rotAz2=rotz(azimuth2);
 
 rot1=rotAz1*rotElev1;
 rot2=rotAz2*rotElev2;
+
+
+rotElev1=rotx(elevation1);   % input to totx, roty, rotz is in degrees 
+rotAz1=roty(azimuth1);
+
+rotElev2=rotx(elevation2);
+rotAz2=roty(azimuth2);
+
+rot1Gamma=rotx(rad2deg(gamma));
+rrod1=[0,1,0];
+rotAlpha1 = @(alpha1) rotz(rad2deg(alpha1));
+rrod2=[0,1,0];
+rotAlpha2 = @(alpha2) rotz(rad2deg(alpha2));
+rrodCam=[0,0,1];
+rotCam = rotx(rad2deg(gamma));
+
 
 % q1=rotm2quat(rot1);
 % q2=rotm2quat(rot2);
@@ -43,12 +59,29 @@ rotdtheta=axang2rotm([r1r2axis',dtheta]);
 curr=r1;
 for i=1:N
     curr=rotdtheta*curr;
-    figure(1); hold on; plot3([curr(1)],[curr(2)],[curr(3)],'bo'); 
+
     elevation(i)=acos(dot(curr,[0,0,1]));
     azimuth(i)=atan2(curr(2),curr(1));
     alpha2(i)=2*asin(sin(elevation(i)/2)/sin(gamma));
     eta=acos((sin(alpha2(i)/2)-sin(gamma)*sin(elevation(i)/2))/(cos(elevation(i)/2)*cos(gamma)));
     alpha1(i)=pi-eta-azimuth(i);
+
+    figure(1); hold on; grid on;    
+    rod1tip=rotAlpha1(alpha1(i))*rot1Gamma*rrod1';
+    rod1=[[0,0,0];rod1tip'];
+    plot3(rod1(:,1), rod1(:,2), rod1(:,3));
+
+    rod2tip=(rotAlpha1(alpha1(i))*rot1Gamma)*(rotAlpha2(alpha2(i))*rrod2');
+    rod2=[[0,0,0];rod2tip']+[1;1]*rod1(2,:);
+    plot3(rod2(:,1), rod2(:,2), rod2(:,3));
+
+    rodCamtip=(rotAlpha1(alpha1(i))*rot1Gamma)*(rotAlpha2(alpha2(i)))*rotCam*rrodCam';
+    rodCam=[[0,0,0];rodCamtip']+[1;1]*rod2(2,:);
+    plot3(rodCam(:,1), rodCam(:,2), rodCam(:,3));
+    
+    plot3(rodCamtip(1),rodCamtip(2),rodCamtip(3),'rx')
+    plot3([curr(1)],[curr(2)],[curr(3)],'bo');
+ 
     disp (sprintf('elevation %f , azimuth %f , alpha1 %f , alpha2 %f',elevation(i),azimuth(i),alpha1(i),alpha2(i)) );
     disp ''
 end
