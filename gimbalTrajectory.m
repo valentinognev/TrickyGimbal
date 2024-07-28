@@ -49,7 +49,6 @@ for i=1:N
  
     disp (sprintf('elevation %f , azimuth %f , alpha1 %f , alpha2 %f',elevation(i),azimuth(i),alpha1(i),alpha2(i)) );
     curr=rotdtheta*curr;
-    break;
     disp ''
 end
 figure(2);
