@@ -4,7 +4,7 @@ close all
 drawArrow3 = @(x,y,z,varargin) quiver3( x(1),y(1),z(1), x(2)-x(1),y(2)-y(1),z(2)-z(1), varargin{:} ); 
 drawArrow3o = @(vec,varargin) quiver3( 0,0,0,vec(1),vec(2),vec(3), varargin{:}); 
 
-alpha1=deg2rad(44);  %deg
+alpha1=deg2rad(0);  %deg
 alpha2=deg2rad(90); %deg
 gamma=deg2rad(20);   %deg
 
@@ -75,8 +75,13 @@ rodCam=[[0,0,0];rodCamtip']+[1;1]*rod2(2,:);
 plot3(rodCam(:,1), rodCam(:,2), rodCam(:,3));
 plotCoordSystem(rodCam(2,:), rodCamrot, .1);
 
-plot3(rodCamtip(1),rodCamtip(2),rodCamtip(3),'rx')
+plot3(rodCamtip(1),rodCamtip(2),rodCamtip(3),'rx');
 
+fff=acos(dot(rodCamtip,[0,0,1])/norm(rodCamtip)/norm([0,0,1]));
+gam=acos(dot(rodCamtip,CA)/norm(rodCamtip)/norm(CA));
+al1=atan2(rod1tip(2),rod1tip(1));
+gamm=atan2(rod1tip(3),norm(rod1tip(1:2)));
+phi_=atan2(rodCamtip(2),rodCamtip(1))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 fffd2=asin(sin(alpha2/2)*sin(gamma));
 d=1;
@@ -99,7 +104,7 @@ eta2=acos((sin(alpha2/2)-sin(gamma)*sin(fffd2))/(cos(fffd2)*cos(gamma)));
 
 % eta=acos(sqrt((sind(alpha2/2)^2-sind(gamma)^2)/(cosd(gamma)^2)))/pi*180;
 phi2=rad2deg(pi-alpha1-eta);
-
+phi_=rad2deg(pi-phi_);
 % figure(2)
 % drawArrow3o(vecmx); hold on; grid on; axis equal; xlabel('x'); ylabel('y');zlabel('z');
 % drawArrow3o(g1vecmx);

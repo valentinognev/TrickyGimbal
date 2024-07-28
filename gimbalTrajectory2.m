@@ -77,7 +77,7 @@ for i=1:N
     rodCam=[[0,0,0];rodCamtip]+[1;1]*rod2tip;
     plot3(rodCam(:,1), rodCam(:,2), rodCam(:,3));
     
-    plot3([curr(1)],[curr(2)],[curr(3)],'bo');
+    plot3([0,curr(1)],[0,curr(2)],[0,curr(3)],'bo');
 
     disp ''
 end
