@@ -3,10 +3,10 @@ function gimbalTrajectory
 
 gamma=20/180*pi;   % [deg]
 
-elevation1=0.67;%deg2rad(-20);  % [rad] elevation angle with Z - phi
-azimuth1=-1.23;%deg2rad(40);  % [rad] azimuth angle in XY plane - curlphi
-elevation2=0.69; %deg2rad(30); % [rad] elevation angle with Z - phi
-azimuth2=1.96;%deg2rad(70);  % [rad] azimuth angle in XY plane - curlphi
+elevation1=deg2rad(-20);  %0.67;% [rad] elevation angle with Z - phi
+azimuth1=deg2rad(40);  %-1.23;% [rad] azimuth angle in XY plane - curlphi
+elevation2=deg2rad(30); %0.69; % [rad] elevation angle with Z - phi
+azimuth2=deg2rad(70);  %1.96;% [rad] azimuth angle in XY plane - curlphi
 
 rotElev1=roty(rad2deg(elevation1));   % input to totx, roty, rotz is in degrees 
 rotAz1=rotz(rad2deg(azimuth1));
@@ -43,9 +43,10 @@ for i=1:N
     eta=acos((sin(alpha2(i)/2)-sin(gamma)*sin(elevation(i)/2))/(cos(elevation(i)/2)*cos(gamma)));
     alpha1(i)=pi-eta-azimuth(i);
 
-    curr_2=[(-cos(alpha1(i)))*cos(gamma)*sin(gamma) - ((-cos(alpha1(i)))*cos(alpha2(i))*cos(gamma) - sin(alpha1(i))*sin(alpha2(i)))*sin(gamma), ...
-        cos(gamma)*sin(alpha1(i))*sin(gamma) - (cos(alpha2(i))*cos(gamma)*sin(alpha1(i)) - cos(alpha1(i))*sin(alpha2(i)))*sin(gamma),...
-        cos(gamma)^2 + cos(alpha2(i))*sin(gamma)^2];
+(-cos[alpha1])*cos[gamma]*sin[gamma] - ((-cos[alpha1])*cos[alpha2]*cos[gamma] - sin[alpha1]*sin[alpha2])*
+    sin[gamma], cos[gamma]*sin[alpha1]*sin[gamma] - 
+   (cos[alpha2]*cos[gamma]*sin[alpha1] - cos[alpha1]*sin[alpha2])*sin[gamma], 
+  cos[gamma]^2 + cos[alpha2]*sin[gamma]^2}
 
     figure(1)
     plot3([0,curr(1)],[0,curr(2)],[0,curr(3)],'b-o');
