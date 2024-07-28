@@ -8,36 +8,15 @@ azimuth1=deg2rad(50);  %-1.23;% [rad] azimuth angle in XY plane - curlphi
 elevation2=deg2rad(30); %0.69; % [rad] elevation angle with Z - phi
 azimuth2=deg2rad(70);  %1.96;% [rad] azimuth angle in XY plane - curlphi
 
-rotElev1=roty(rad2deg(elevation1));   % input to totx, roty, rotz is in degrees 
+rotElev1=rotx(rad2deg(-elevation1));   % input to totx, roty, rotz is in degrees 
 rotAz1=rotz(rad2deg(azimuth1));
 
-rotElev2=roty(rad2deg(elevation2));
+rotElev2=rotx(rad2deg(-elevation2));
 rotAz2=rotz(rad2deg(azimuth2));
 
 rot1=rotAz1*rotElev1;
 rot2=rotAz2*rotElev2;
 
-
-rotElev1=rotx(rad2deg(elevation1));   % input to totx, roty, rotz is in degrees 
-rotAz1=roty(rad2deg(azimuth1));
-
-rotElev2=rotx(rad2deg(elevation2));
-rotAz2=roty(rad2deg(azimuth2));
-
-rot1Gamma=rotx(rad2deg(gamma));
-rrod1=[0,1,0];
-rotAlpha1 = @(alpha1) rotz(rad2deg(alpha1));
-rrod2=[0,1,0];
-rotAlpha2 = @(alpha2) rotz(rad2deg(alpha2));
-rrodCam=[0,0,1];
-rotCam = rotx(rad2deg(gamma));
-
-
-% q1=rotm2quat(rot1);
-% q2=rotm2quat(rot2);
-
-% q1_=eul2quat([0,-elevation1,-azimuth1]/180*pi,'ZYX');
-% q2_=eul2quat([azimuth2,elevation2,0]/180*pi,'XYZ');
 rinit=[0;0;1];
 r1=rot1*rinit;
 r2=rot2*rinit;
@@ -62,7 +41,7 @@ for i=1:N
     azimuth(i)=atan2(curr(2),curr(1));
     alpha2(i)=2*asin(sin(elevation(i)/2)/sin(gamma));
     eta=acos((sin(alpha2(i)/2)-sin(gamma)*sin(elevation(i)/2))/(cos(elevation(i)/2)*cos(gamma)));
-    alpha1(i)=etaazimuth(i);
+    alpha1(i)=pi-eta-azimuth(i);
 
     figure(1)
     plot3([0,curr(1)],[0,curr(2)],[0,curr(3)],'b-o');

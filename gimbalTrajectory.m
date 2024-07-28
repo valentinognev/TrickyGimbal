@@ -3,8 +3,8 @@ function gimbalTrajectory
 
 gamma=20/180*pi;   % [deg]
 
-elevation1=deg2rad(20);  %0.67;% [rad] elevation angle with Z - phi
-azimuth1=deg2rad(50);  %-1.23;% [rad] azimuth angle in XY plane - curlphi
+elevation1=deg2rad(-20);  %0.67;% [rad] elevation angle with Z - phi
+azimuth1=deg2rad(40);  %-1.23;% [rad] azimuth angle in XY plane - curlphi
 elevation2=deg2rad(30); %0.69; % [rad] elevation angle with Z - phi
 azimuth2=deg2rad(70);  %1.96;% [rad] azimuth angle in XY plane - curlphi
 
@@ -17,27 +17,6 @@ rotAz2=rotz(rad2deg(azimuth2));
 rot1=rotAz1*rotElev1;
 rot2=rotAz2*rotElev2;
 
-
-rotElev1=rotx(rad2deg(elevation1));   % input to totx, roty, rotz is in degrees 
-rotAz1=roty(rad2deg(azimuth1));
-
-rotElev2=rotx(rad2deg(elevation2));
-rotAz2=roty(rad2deg(azimuth2));
-
-rot1Gamma=rotx(rad2deg(gamma));
-rrod1=[0,1,0];
-rotAlpha1 = @(alpha1) rotz(rad2deg(alpha1));
-rrod2=[0,1,0];
-rotAlpha2 = @(alpha2) rotz(rad2deg(alpha2));
-rrodCam=[0,0,1];
-rotCam = rotx(rad2deg(gamma));
-
-
-% q1=rotm2quat(rot1);
-% q2=rotm2quat(rot2);
-
-% q1_=eul2quat([0,-elevation1,-azimuth1]/180*pi,'ZYX');
-% q2_=eul2quat([azimuth2,elevation2,0]/180*pi,'XYZ');
 rinit=[0;0;1];
 r1=rot1*rinit;
 r2=rot2*rinit;
@@ -70,8 +49,8 @@ for i=1:N
  
     disp (sprintf('elevation %f , azimuth %f , alpha1 %f , alpha2 %f',elevation(i),azimuth(i),alpha1(i),alpha2(i)) );
     curr=rotdtheta*curr;
-    disp ''
     break;
+    disp ''
 end
 figure(2);
 plot(elevation,'x-'); hold on
@@ -93,13 +72,13 @@ rotCam = roty(rad2deg(pi/2-gamma));
 figure(fignum); hold on; grid on;
 plotCoordSystem([0,0,0], eye(3), .1);
 
-rod1rot=rotAlpha1(alpha1)*rot1Gamma;
+rod1rot=rotAlpha1(pi-alpha1)*rot1Gamma;
 rod1tip=rod1rot*rrod1';
 rod1=[[0,0,0];rod1tip'];
 plot3(rod1(:,1), rod1(:,2), rod1(:,3));
 plotCoordSystem(rod1tip', rod1rot, .1);
 
-rod2rot=rod1rot*rotAlpha2(-alpha2);
+rod2rot=rod1rot*rotAlpha2(alpha2);
 rod2tip=rod2rot*rrod2';
 rod2=[[0,0,0];rod2tip']+[1;1]*rod1(2,:);
 plot3(rod2(:,1), rod2(:,2), rod2(:,3));
