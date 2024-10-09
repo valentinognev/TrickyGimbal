@@ -2,13 +2,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
 
-def gimbal_trajectory():
-    gamma = np.deg2rad(20)   # [deg]
+def main():
+    # figax = gimbal_trajectory(elevation1=np.deg2rad(5), azimuth1=np.deg2rad(40), elevation2=np.deg2rad(30), azimuth2=np.deg2rad(70))
+    # gimbal_trajectory(elevation1=np.deg2rad(30), azimuth1=np.deg2rad(70), elevation2=np.deg2rad(30), azimuth2=np.deg2rad(-70), figax=figax)
+    # gimbal_trajectory(elevation1=np.deg2rad(30), azimuth1=np.deg2rad(-70), elevation2=np.deg2rad(5), azimuth2=np.deg2rad(40), figax=figax)
+    figax = gimbal_trajectory(elevation1=np.deg2rad(5), azimuth1=np.deg2rad(5), elevation2=np.deg2rad(50), azimuth2=np.deg2rad(70))
+    gimbal_trajectory(elevation1=np.deg2rad(50), azimuth1=np.deg2rad(70), elevation2=np.deg2rad(30), azimuth2=np.deg2rad(-70), figax=figax)
+    gimbal_trajectory(elevation1=np.deg2rad(30), azimuth1=np.deg2rad(-70), elevation2=np.deg2rad(5), azimuth2=np.deg2rad(5), figax=figax)
 
-    elevation1 = np.deg2rad(-20)  # [rad] elevation angle with Z - phi
-    azimuth1 = np.deg2rad(40)  # [rad] azimuth angle in XY plane - curlphi
-    elevation2 = np.deg2rad(30)  # [rad] elevation angle with Z - phi
-    azimuth2 = np.deg2rad(70)  # [rad] azimuth angle in XY plane - curlphi
+    plt.show()
+    pass
+
+def gimbal_trajectory(elevation1=np.deg2rad(-20), azimuth1=np.deg2rad(40), 
+                      elevation2=np.deg2rad(30), azimuth2=np.deg2rad(70),
+                      figax=None):
+    # elevation1 = np.deg2rad(-20)  # [rad] elevation angle with Z - phi
+    # azimuth1 = np.deg2rad(40)  # [rad] azimuth angle in XY plane - curlphi
+    # elevation2 = np.deg2rad(30)  # [rad] elevation angle with Z - phi
+    # azimuth2 = np.deg2rad(70)  # [rad] azimuth angle in XY plane - curlphi    
+    gamma = np.deg2rad(20)   # [deg]
 
     rot_elev1 = R.from_euler('y', np.rad2deg(elevation1), degrees=True).as_matrix()
     rot_az1 = R.from_euler('z', np.rad2deg(azimuth1), degrees=True).as_matrix()
@@ -37,13 +49,15 @@ def gimbal_trajectory():
     alpha1 = []
     alpha2 = []
 
-    fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot([0, r1[0]], [0, r1[1]], [0, r1[2]], 'rx-')
-    ax.plot([0, r2[0]], [0, r2[1]], [0, r2[2]], 'mx-')
-    ax.set_xlabel('x')
-    ax.set_ylabel('y')
-    ax.set_zlabel('z')
+    if figax is None:
+        fig = plt.figure(100)
+        figax = fig.add_subplot(111, projection='3d')
+
+    figax.plot([0, r1[0]], [0, r1[1]], [0, r1[2]], 'rx-')
+    figax.plot([0, r2[0]], [0, r2[1]], [0, r2[2]], 'mx-')
+    figax.set_xlabel('x')
+    figax.set_ylabel('y')
+    figax.set_zlabel('z')
     plt.grid(True)
 
     for i in range(N):
@@ -59,8 +73,8 @@ def gimbal_trajectory():
             np.cos(gamma)**2 + np.cos(alpha2_i) * np.sin(gamma)**2
         ])
 
-        ax.plot([0, curr[0]], [0, curr[1]], [0, curr[2]], 'b-o')
-        plot_gimbal(alpha1_i, alpha2_i, gamma, ax)
+        figax.plot([0, curr[0]], [0, curr[1]], [0, curr[2]], 'b-o')
+        plot_gimbal(alpha1_i, alpha2_i, gamma, figax)
 
         elevation.append(elevation_i)
         azimuth.append(azimuth_i)
@@ -77,13 +91,15 @@ def gimbal_trajectory():
     Zb = 0.5*max_range*np.mgrid[-1:2:2,-1:2:2,-1:2:2][2].flatten() 
     # Comment or uncomment following both lines to test the fake bounding box:
     for xb, yb, zb in zip(Xb, Yb, Zb):
-        ax.plot([xb], [yb], [zb], 'w')
+        figax.plot([xb], [yb], [zb], 'w')
 
     #
-    plt.figure()
+    plt.figure(200)
     plt.plot(elevation, 'x-')
     plt.plot(azimuth, 'x-')
-    plt.show()
+
+    return figax
+
 
 def plot_gimbal(alpha1, alpha2, gamma, ax):
     rot1_gamma = R.from_euler('y', np.rad2deg(gamma), degrees=True).as_matrix()
@@ -137,4 +153,7 @@ def plot_coord_system(pos, rot_mat, scale, ax):
     ax.set_ylabel('Y')
     ax.set_zlabel('Z')
 
-gimbal_trajectory()
+
+if __name__ == '__main__':
+    main()
+
