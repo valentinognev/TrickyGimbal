@@ -3,13 +3,9 @@ import matplotlib.pyplot as plt
 from scipy.spatial.transform import Rotation as R
 
 def main():
-    # figax = gimbal_trajectory(elevation1=np.deg2rad(5), azimuth1=np.deg2rad(40), elevation2=np.deg2rad(30), azimuth2=np.deg2rad(70))
-    # gimbal_trajectory(elevation1=np.deg2rad(30), azimuth1=np.deg2rad(70), elevation2=np.deg2rad(30), azimuth2=np.deg2rad(-70), figax=figax)
-    # gimbal_trajectory(elevation1=np.deg2rad(30), azimuth1=np.deg2rad(-70), elevation2=np.deg2rad(5), azimuth2=np.deg2rad(40), figax=figax)
-    figax = gimbal_trajectory(elevation1=np.deg2rad(5), azimuth1=np.deg2rad(5), elevation2=np.deg2rad(50), azimuth2=np.deg2rad(70))
-    gimbal_trajectory(elevation1=np.deg2rad(50), azimuth1=np.deg2rad(70), elevation2=np.deg2rad(30), azimuth2=np.deg2rad(-70), figax=figax)
-    gimbal_trajectory(elevation1=np.deg2rad(30), azimuth1=np.deg2rad(-70), elevation2=np.deg2rad(5), azimuth2=np.deg2rad(5), figax=figax)
-
+    figax = gimbal_trajectory(elevation1=np.deg2rad(5), azimuth1=np.deg2rad(5), elevation2=np.deg2rad(40), azimuth2=np.deg2rad(60))
+    gimbal_trajectory(elevation1=np.deg2rad(40), azimuth1=np.deg2rad(60), elevation2=np.deg2rad(40), azimuth2=np.deg2rad(-30), figax=figax)
+    gimbal_trajectory(elevation1=np.deg2rad(40), azimuth1=np.deg2rad(-30), elevation2=np.deg2rad(5), azimuth2=np.deg2rad(5), figax=figax)
     plt.show()
     pass
 
@@ -66,6 +62,8 @@ def gimbal_trajectory(elevation1=np.deg2rad(-20), azimuth1=np.deg2rad(40),
         alpha2_i = 2 * np.arcsin(np.sin(elevation_i / 2) / np.sin(gamma))
         eta = np.arccos((np.sin(alpha2_i / 2) - np.sin(gamma) * np.sin(elevation_i / 2)) / (np.cos(elevation_i / 2) * np.cos(gamma)))
         alpha1_i = np.pi - eta - azimuth_i
+        alpha1_i_deg = np.rad2deg(alpha1_i)
+        alpha2_i_deg = np.rad2deg(alpha2_i)
 
         curr_2 = np.array([
             (-np.cos(alpha1_i)) * np.cos(gamma) * np.sin(gamma) - ((-np.cos(alpha1_i)) * np.cos(alpha2_i) * np.cos(gamma) - np.sin(alpha1_i) * np.sin(alpha2_i)) * np.sin(gamma),
@@ -81,7 +79,7 @@ def gimbal_trajectory(elevation1=np.deg2rad(-20), azimuth1=np.deg2rad(40),
         alpha1.append(alpha1_i)
         alpha2.append(alpha2_i)
 
-        print(f'elevation {elevation_i:.6f} , azimuth {azimuth_i:.6f} , alpha1 {alpha1_i:.6f} , alpha2 {alpha2_i:.6f}')
+        print(f'elevation {elevation_i:.6f} , azimuth {azimuth_i:.6f} , alpha1_deg {alpha1_i_deg:.6f} , alpha2_deg {alpha2_i_deg:.6f}, alpha1 {alpha1_i:.6f} , alpha2 {alpha2_i:.6f}')
         curr = rotdtheta @ curr
     #ax.axis('equal')
     # Create cubic bounding box to simulate equal aspect ratio
