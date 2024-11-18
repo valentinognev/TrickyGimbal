@@ -14,21 +14,21 @@ void cross(float a[3], float b[3], float result[3]);
 float dot(float a[3], float b[3]);
 void axang2rotm(float axis[3], float angle, float matrix[3][3]);
 void matvecmul(const float mat[3][3], const float vec[3], float result[3]);
+void matmul(float a[3][3], float b[3][3], float result[3][3]) ;
 
 void getSteps(const float elevation1, const float azimuth1, const float elevation2, const float azimuth2,
 float alpha2[NUMOFSTEPS], float alpha1[NUMOFSTEPS]);
 
 int main() 
 {
-    float elevation1 = DEG2RAD(20);
-    float azimuth1 = DEG2RAD(0);
-    float elevation2 = DEG2RAD(30);
-    float azimuth2 = DEG2RAD(70);
+    float elevation1 = DEG2RAD(5);
+    float azimuth1 = DEG2RAD(5);
+    float elevation2 = DEG2RAD(40);
+    float azimuth2 = DEG2RAD(60);
 
-    elevation1 = 0.67;
-    azimuth1 = -1.23;
-    elevation2 = 0.69;
-    azimuth2 = 1.96;
+    // gimbal_trajectory(elevation1=np.deg2rad(5), azimuth1=np.deg2rad(5), elevation2=np.deg2rad(40), azimuth2=np.deg2rad(60))
+    // gimbal_trajectory(elevation1=np.deg2rad(40), azimuth1=np.deg2rad(60), elevation2=np.deg2rad(40), azimuth2=np.deg2rad(-30), figax=figax)
+    // gimbal_trajectory(elevation1=np.deg2rad(40), azimuth1=np.deg2rad(-30), elevation2=np.deg2rad(5), azimuth2=np.deg2rad(5), figax=figax)
 
     float alpha1[NUMOFSTEPS]={0};
     float alpha2[NUMOFSTEPS]={0};
@@ -96,16 +96,15 @@ void getSteps(const float elevation1, const float azimuth1, const float elevatio
         alpha2[i] = 2 * asin(sin(elevation[i] / 2) / sin(GAMMA));
         eta = acos((sin(alpha2[i] / 2) - sin(GAMMA) * sin(elevation[i] / 2)) / (cos(elevation[i] / 2) * cos(GAMMA)));
         alpha1[i] = PI - eta - azimuth[i];
-        printf("elevation %f , azimuth %f , alpha1 %f , alpha2 %f \n",elevation[i],azimuth[i],alpha1[i],alpha2[i]) ;
+        printf("elevation %f , azimuth %f , alpha1_deg %f , alpha2_deg %f , alpha1 %f , alpha2 %f \n",elevation[i],azimuth[i],alpha1[i]/PI*180,alpha2[i]/PI*180,alpha1[i],alpha2[i]) ;
     }
-
-    return 0;
 }
 
 
 
 // Matrix multiplication
-void matmul(float a[3][3], float b[3][3], float result[3][3]) {
+void matmul(float a[3][3], float b[3][3], float result[3][3]) 
+{
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
             result[i][j] = 0;
